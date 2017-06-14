@@ -178,7 +178,7 @@ class Post extends Component {
     return (
       <div>
         {post}
-        <div><span className="b4 f7">  瀏覽 第 ?/? 頁 (???%) </span><span className="b7 f0 hl"> 目前顯示: 第 ??~?? 行 </span><span className="b7"> <span className="f1">(y)</span><span className="f0">回應</span><span className="f1">(X%)</span><span className="f0">推文</span><span className="f1">(h)</span><span className="f0">說明</span><span className="f1">(←)</span><span className="f0">離開   </span></span></div>
+        <div><span className="b4 f7">  瀏覽 第 ?/? 頁 (???%) </span><span className="b7 f0 hl"> 目前顯示: 第 ??~?? 行 </span><span className="b7"> <span className="f1">(y)</span><span className="f0">回應</span><span className="f1">(X%)</span><span className="f0">推文</span><span className="f1">(h)</span><span className="f0">說明</span><a className="link" onClick={()=>{this.props.history.goBack()}}><span className="f1">(←)</span><span className="f0">離開   </span></a></span></div>
       </div>
     )
   }
