@@ -54,11 +54,66 @@ class List extends Component {
   }
 }
 
+class Post extends Component {
+  constructor() {
+    super();
+    this.state = {
+      status: 'Loading...',
+    }
+  }
+  render() {
+    let post;
+    if(this.state.status !== 'loaded')
+      post = this.state.status;
+    else {
+      const p = this.state.post;
+      post = (
+        <div className="article">
+          <div className="header">
+            <span className="author">
+              {p.author}
+            </span>
+            <span className="title">
+              {p.title}
+            </span>
+            <span className="time">
+              {p.time}
+            </span>
+          </div>
+          <div className="content">
+            {p.content}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div>
+        {post}
+      </div>
+    )
+  }
+  componentDidMount() {
+    fetch(server + `/api/post?id=${this.props.match.params.postId}`).then(res=>{
+      if(!res.ok)
+        throw res.status;
+      return res.json();
+    }).then(json=>{
+      this.setState({ status: 'loaded', post: json });
+    }).catch(e=>{
+      this.setState({ status: 'Load failed.' });
+      console.log('Error: '+ e);
+    });
+  }
+}
+
 class Blog extends Component {
   render() {
     return (
       <Router>
-        <Route exact path="/" component={List}/>
+        <div className="main">
+          <Route exact path="/" component={List}/>
+          <Route path="/post/:postId" component={Post}/>
+        </div>
       </Router>
     );
   }
