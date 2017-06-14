@@ -58,6 +58,17 @@ a.link:hover{
   color: #000;
   background-color: #fff;
 }
+textarea{
+  width: 100%;
+  border-style: none;
+  border-width: 0px;
+  padding: 0px;
+  background-color: #000;
+  resize: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: inherit;
+}
 
 @media screen and (min-aspect-ratio: 5/3) {
   .bbs {

@@ -95,26 +95,33 @@ class Post extends Component {
       const p = this.state.post;
       post = (
         <div className="article">
-          <div className="header">
-            <span className="author">
-              {p.author}
-            </span>
-            <span className="title">
-              {p.title}
-            </span>
-            <span className="time">
-              {p.time}
-            </span>
+          <div>
+            <span className="b7 f4"> 作者 </span>
+            <span className="b4 f7">{pad(52,' '+p.author, false)}</span>
+            <span className="b7 f4"> 看板 </span>
+            <span className="b4 f7"> Simple_Blog </span>
           </div>
-          <div className="content">
-            {p.content}
+          <div>
+            <span className="b7 f4"> 標題 </span>
+            <span className="b4 f7">{pad(71,' '+p.title, false)}</span>
           </div>
+          <div>
+            <span className="b7 f4"> 時間 </span>
+            <span className="b4 f7">{pad(71,' '+(new Date(p.time)).toLocaleString(), false)}</span>
+          </div>
+          <div className="f6">───────────────────────────────────────</div>
+          <textarea
+            rows="19"
+            value={p.content}
+            readOnly
+          ></textarea>
         </div>
       );
     }
     return (
       <div>
         {post}
+        <div><span className="b4 f7">  瀏覽 第 ?/? 頁 (???%) </span><span className="b7 f0 hl"> 目前顯示: 第 ??~?? 行 </span><span className="b7"> <span className="f1">(y)</span><span className="f0">回應</span><span className="f1">(X%)</span><span className="f0">推文</span><span className="f1">(h)</span><span className="f0">說明</span><span className="f1">(←)</span><span className="f0">離開   </span></span></div>
       </div>
     )
   }
@@ -141,13 +148,9 @@ class Edit extends Component {
       <div className="edit">
         <textarea
           ref="input"
-          rows="22"
+          rows="23"
         ></textarea>
-        <div className="bar">
-          <Link className="newpost" to="/" onClick={this.onSubmit}>
-            發表文章
-          </Link>
-        </div>
+        <div><span className="b6 f4"> 編輯文章 </span><span className="b7"> <span className="f1">(^Z/F1)</span><span className="f0">說明</span><span className="f1"> (^P/^G)</span><span className="f0">插入符號/範本</span><Link className="link" to="/" onClick={this.onSubmit}><span className="f1"> (^X/^Q)</span><span className="f0">離開</span></Link><span className="f0">  ║插入│aipr║  ?:  ? </span></span></div>
       </div>
 
     )
