@@ -13,3 +13,6 @@ mongoose.model('PostModel', PostSchema);
 if (process.env.DEV) {
   mongoose.connect('mongodb://localhost/simple-blog');
 }
+else {
+  mongoose.connect('mongodb://username:password@host:port/database');
+}
