@@ -37,7 +37,6 @@ class List extends Component {
       const p = parseInt(this.props.match.params.p, 10);
       let start = this.state.posts.length - p - 19;
       const cursor = parseInt(this.props.match.params.c, 10);
-      console.log([this.state.posts.length, start]);
       if(p <1)
         posts = (
           <Redirect to={`/p/1/${cursor}`} />
