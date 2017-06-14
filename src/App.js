@@ -4,6 +4,9 @@ import './App.css';
 let server = '';
 if(process.env.NODE_ENV==='development')
   server = 'http://localhost:5000'
+function newline(n) {
+  return new Array(n+1).join('\n');
+}
 function pad(n, s, f) {
   if(typeof s !== 'undefined') {
     if(f)
@@ -19,8 +22,10 @@ class List extends Component {
     super();
     this.state = {
       status: 'Loading...',
+      cursor: 19
     }
     this.onClick = this.onClick.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
   onClick() {
     this.props.history.push('/test');
@@ -28,32 +33,40 @@ class List extends Component {
   render() {
     let posts;
     if(this.state.status !== 'loaded')
-      posts = this.state.status;
+      posts = this.state.status+newline(20);
     else {
-      const p = this.props.match.params.p;
+      const p = parseInt(this.props.match.params.p, 0);
       let start = this.state.posts.length - p - 19;
+      const cursor = this.state.cursor;
       console.log([this.state.posts.length, start]);
-      if(start < 0)
+      if(p <1)
+        posts = (
+          <Redirect to="/p/1" />
+        )
+      else if(start < 0 && this.state.posts.length > 19) {
         posts = (
           <Redirect to={`/p/${this.state.posts.length - 19}`} />
         )
-      else
-      posts = this.state.posts.slice(start, start+20).map((p,i)=>(
-        <Link className="row link" to={`/post/${p._id}`} key={p._id}>
-          <span className="index">
-            {pad(7, start + i + 1, true)}
-          </span>
-          <span className="date">
-            {(d=>pad(6,d.getMonth(),true)+'/'+pad(2,d.getDate(),true)+' ')(new Date(p.time))}
-          </span>
-          <span className="author">
-            {pad(13,p.author,false)}
-          </span>
-          <span className="title">
-            {'□ '+p.title}
-          </span>
-        </Link>
-      ));
+      }
+      else {
+        posts = this.state.posts.slice(start, start+20).map((p,i)=>(
+          <Link className={`row link ${cursor===i?'cursor':''}`} to={`/post/${p._id}`} key={p._id}>
+            <span className="index">
+              {(cursor===i?'>':'')+pad(7, start + i + 1, true)}
+            </span>
+            <span className="date">
+              {(d=>pad(6,d.getMonth(),true)+'/'+pad(2,d.getDate(),true)+' ')(new Date(p.time))}
+            </span>
+            <span className="author">
+              {pad(13,p.author,false)}
+            </span>
+            <span className="title">
+              {'□ '+p.title}
+            </span>
+          </Link>
+        ));
+        posts.push(newline(20-(this.state.posts.slice(start, start+20).length)));
+      }
     }
     return (
       <div className="list">
@@ -65,8 +78,44 @@ class List extends Component {
       </div>
     )
   }
+  onKeyDown(e) {
+    let cursor = this.state.cursor;
+    const p = parseInt(this.props.match.params.p, 0);
+    let offset = 1;
+    switch(e.keyCode){
+      case 35: //end
+        offset*= 10000;
+      case 34: //pgdn
+        offset*= 20;
+      case 40: //down
+        cursor+=offset;
+        if(cursor > 19){
+          this.props.history.replace(`/p/${p - offset}`)
+          cursor = 19;
+        }
+        break;
+      case 39: //right
+        document.querySelector('.cursor').click();
+        break;
+      case 36: //home
+        offset*= 10000;
+      case 33: //pgup
+        offset*= 20;
+      case 38: //up
+        cursor-=offset;
+        if(cursor < 0){
+          this.props.history.replace(`/p/${p + offset}`)
+          cursor = 0;
+        }
+        break;
+      case 37: //left
+        break;
+      default:
+    }
+    this.setState({ cursor });
+  }
   componentDidMount() {
-    console.log('mounted');
+    document.addEventListener('keydown', this.onKeyDown, false);
     fetch(server + '/api/posts').then(res=>{
       if(!res.ok)
         throw res.status;
@@ -77,6 +126,9 @@ class List extends Component {
       this.setState({ status: 'Load failed.' });
       console.log('Error: '+ e);
     });
+  }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onKeyDown, false);
   }
 }
 
@@ -90,7 +142,7 @@ class Post extends Component {
   render() {
     let post;
     if(this.state.status !== 'loaded')
-      post = this.state.status;
+      post = this.state.status+newline(23);
     else {
       const p = this.state.post;
       post = (
