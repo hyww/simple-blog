@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 require('./db')
 const Post = mongoose.model('PostModel');
-new Post({ title: 'test', content: 'Hello World!', author: 'hyww'}).save();
+new Post({ title: 'test', content: 'Hello World!', author: 'hyww'}).save(); // FIXME
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -21,7 +21,11 @@ if (process.env.DEV) {
 }
 
 app.get('/api/posts', (req, res) => {
-  Post.find({}, 'title time author', (err, posts) => {
+  var query = Post.find({});
+  query.select('title time author');
+  query.sort({ time: 1 });
+
+  query.exec((err, posts) => {
     if(err)
       res.status(500).send({ error: 'Get posts failed!' });
     else {
