@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
 import './App.css';
-let server = '/';
+let server = '';
 if(process.env.NODE_ENV==='development')
   server = 'http://localhost:5000'
 function pad(n, s, f) {
