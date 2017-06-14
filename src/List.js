@@ -21,18 +21,21 @@ class List extends Component {
       posts = this.state.status+newline(20);
     else {
       const p = parseInt(this.props.match.params.p, 10);
-      let start = this.state.posts.length - p - 19;
+      const l = this.state.posts.length;
+      let start = l - p - 19;
+      const maxp = l >20?(l-19) :1;
       const cursor = parseInt(this.props.match.params.c, 10);
       if(p <1)
         posts = (
           <Redirect to={`/p/1/${cursor}`} />
         )
-      else if(start < 0 && this.state.posts.length > 19) {
+      else if(p>maxp) {
         posts = (
-          <Redirect to={`/p/${this.state.posts.length - 19}/${cursor}`} />
+          <Redirect to={`/p/${maxp}/${cursor}`} />
         )
       }
       else {
+        if(start < 0) start = 0;
         posts = this.state.posts.slice(start, start+20).map((p,i)=>(
           <Link className={`row link ${cursor===i?'cursor':''}`} to={`/post/${p._id}`} key={p._id}>
             <span className="index">
