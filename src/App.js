@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import './App.css';
-const server = 'http://localhost:5000'
+let server = '/';
+if(process.env.NODE_ENV==='development')
+  server = 'http://localhost:5000'
 
 class List extends Component {
   constructor() {
@@ -35,6 +37,11 @@ class List extends Component {
     }
     return (
       <div className="list">
+        <div className="bar">
+          <Link className="newpost" to="/edit">
+            發表文章
+          </Link>
+        </div>
         {posts}
       </div>
     )
@@ -105,6 +112,40 @@ class Post extends Component {
     });
   }
 }
+class Edit extends Component {
+  constructor() {
+    super();
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+  render() {
+    return (
+      <div className="edit">
+        <textarea
+          ref="input"
+          rows="22"
+        ></textarea>
+        <div className="bar">
+          <Link className="newpost" to="/" onClick={this.onSubmit}>
+            發表文章
+          </Link>
+        </div>
+      </div>
+
+    )
+  }
+  onSubmit() {
+    fetch(server + '/api/post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title: 'test', // FIXME
+        content: this.refs.input.value,
+      })
+    });
+  }
+}
 
 class Blog extends Component {
   render() {
@@ -113,6 +154,7 @@ class Blog extends Component {
         <div className="main">
           <Route exact path="/" component={List}/>
           <Route path="/post/:postId" component={Post}/>
+          <Route path="/edit" component={Edit}/>
         </div>
       </Router>
     );
