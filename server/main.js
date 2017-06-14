@@ -12,14 +12,12 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('build'));
 
-/*
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
-*/
+if (process.env.DEV) {
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+  });
+}
 
 app.get('/api/posts', (req, res) => {
   Post.find({}, 'title time author', (err, posts) => {
