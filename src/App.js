@@ -22,7 +22,6 @@ class List extends Component {
     super();
     this.state = {
       status: 'Loading...',
-      cursor: 19
     }
     this.onClick = this.onClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -35,17 +34,17 @@ class List extends Component {
     if(this.state.status !== 'loaded')
       posts = this.state.status+newline(20);
     else {
-      const p = parseInt(this.props.match.params.p, 0);
+      const p = parseInt(this.props.match.params.p, 10);
       let start = this.state.posts.length - p - 19;
-      const cursor = this.state.cursor;
+      const cursor = parseInt(this.props.match.params.c, 10);
       console.log([this.state.posts.length, start]);
       if(p <1)
         posts = (
-          <Redirect to="/p/1" />
+          <Redirect to={`/p/1/${cursor}`} />
         )
       else if(start < 0 && this.state.posts.length > 19) {
         posts = (
-          <Redirect to={`/p/${this.state.posts.length - 19}`} />
+          <Redirect to={`/p/${this.state.posts.length - 19}/${cursor}`} />
         )
       }
       else {
@@ -79,10 +78,16 @@ class List extends Component {
     )
   }
   onKeyDown(e) {
-    let cursor = this.state.cursor;
-    const p = parseInt(this.props.match.params.p, 0);
+    const p = parseInt(this.props.match.params.p, 10);
+    let cursor = parseInt(this.props.match.params.c, 10);
     let offset = 1;
     switch(e.keyCode){
+      case 80: //p
+        if(e.ctrlKey) {
+          this.props.history.push('/edit');
+          e.preventDefault();
+        }
+        return;
       case 35: //end
         offset*= 10000;
       case 34: //pgdn
@@ -90,13 +95,13 @@ class List extends Component {
       case 40: //down
         cursor+=offset;
         if(cursor > 19){
-          this.props.history.replace(`/p/${p - offset}`)
-          cursor = 19;
+          this.props.history.replace(`/p/${p - offset}/19`)
+          return;
         }
         break;
       case 39: //right
         document.querySelector('.cursor').click();
-        break;
+        return;
       case 36: //home
         offset*= 10000;
       case 33: //pgup
@@ -104,15 +109,15 @@ class List extends Component {
       case 38: //up
         cursor-=offset;
         if(cursor < 0){
-          this.props.history.replace(`/p/${p + offset}`)
-          cursor = 0;
+          this.props.history.replace(`/p/${p + offset}/0`)
+          return;
         }
         break;
       case 37: //left
         break;
       default:
     }
-    this.setState({ cursor });
+    this.props.history.replace(`/p/${p}/${cursor}`)
   }
   componentDidMount() {
     document.addEventListener('keydown', this.onKeyDown, false);
@@ -138,6 +143,7 @@ class Post extends Component {
     this.state = {
       status: 'Loading...',
     }
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
   render() {
     let post;
@@ -177,29 +183,43 @@ class Post extends Component {
       </div>
     )
   }
+  onKeyDown(e) {
+    switch(e.keyCode){
+      case 37: //left
+        this.props.history.goBack();
+        break;
+      default:
+    }
+  }
   componentDidMount() {
+    document.addEventListener('keydown', this.onKeyDown, false);
     fetch(server + `/api/post?id=${this.props.match.params.postId}`).then(res=>{
       if(!res.ok)
         throw res.status;
       return res.json();
     }).then(json=>{
       this.setState({ status: 'loaded', post: json });
+      document.querySelector('textarea').focus();
     }).catch(e=>{
       this.setState({ status: 'Load failed.' });
       console.log('Error: '+ e);
     });
+  }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onKeyDown, false);
   }
 }
 class Edit extends Component {
   constructor() {
     super();
     this.onSubmit = this.onSubmit.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
   render() {
     return (
       <div className="edit">
         <textarea
-          ref="input"
+          id="input"
           rows="23"
         ></textarea>
         <div><span className="b6 f4"> 編輯文章 </span><span className="b7"> <span className="f1">(^Z/F1)</span><span className="f0">說明</span><span className="f1"> (^P/^G)</span><span className="f0">插入符號/範本</span><Link className="link" to="/" onClick={this.onSubmit}><span className="f1"> (^X/^Q)</span><span className="f0">離開</span></Link><span className="f0">  ║插入│aipr║  ?:  ? </span></span></div>
@@ -215,9 +235,29 @@ class Edit extends Component {
       },
       body: JSON.stringify({
         title: 'test', // FIXME
-        content: this.refs.input.value,
+        content: document.querySelector('textarea').value,
       })
     });
+  }
+  onKeyDown(e) {
+    switch(e.keyCode){
+      case 88: //X
+      case 81: //Q
+        if(e.ctrlKey) {
+          this.onSubmit();
+          this.props.history.push('/');
+          e.preventDefault();
+        }
+        break;
+      default:
+    }
+  }
+  componentDidMount() {
+    document.querySelector('textarea').focus();
+    document.addEventListener('keydown', this.onKeyDown, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.onKeyDown, false);
   }
 }
 
@@ -227,10 +267,10 @@ class Blog extends Component {
       <Router>
         <div className="bbs">
           <Switch>
-            <Route path="/p/:p" component={List}/>
+            <Route path="/p/:p/:c" component={List}/>
             <Route path="/post/:postId" component={Post}/>
             <Route path="/edit" component={Edit}/>
-            <Redirect to="/p/1" />
+            <Redirect to="/p/1/19" />
           </Switch>
         </div>
       </Router>
