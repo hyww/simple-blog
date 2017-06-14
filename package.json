@@ -14,11 +14,13 @@
     "react-scripts": "1.0.7"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm run server",
+    "start:client": "react-scripts start",
     "build": "react-scripts build",
     "server": "node server/main.js",
     "server:dev":"DEV=TRUE npm run server",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && now"
   }
 }
