@@ -58,6 +58,11 @@ a.link:hover{
   color: #000;
   background-color: #fff;
 }
+textarea.inline{
+  display: inline-block;
+  width: auto;
+  overflow: hidden;
+}
 textarea{
   width: 100%;
   border-style: none;
