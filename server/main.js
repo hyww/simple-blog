@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 require('./db')
 const Post = mongoose.model('PostModel');
-new Post({ title: 'test', content: 'Hello World!', author: 'hyww'}).save(); // FIXME
 
 const express = require('express');
 const bodyParser = require('body-parser');

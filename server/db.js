@@ -10,5 +10,6 @@ const PostSchema = new Schema({
 });
 
 mongoose.model('PostModel', PostSchema);
-mongoose.connect('mongodb://localhost/simple-blog');
-
+if (process.env.DEV) {
+  mongoose.connect('mongodb://localhost/simple-blog');
+}
